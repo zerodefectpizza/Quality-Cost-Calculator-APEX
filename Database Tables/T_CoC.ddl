@@ -1,5 +1,5 @@
 -- Generiert von Oracle SQL Developer Data Modeler 24.3.1.351.0831
---   am/um:        2025-08-24 08:08:31 MESZ
+--   am/um:        2025-08-24 10:00:22 MESZ
 --   Site:      Oracle Database 21c
 --   Typ:      Oracle Database 21c
 
@@ -9,44 +9,72 @@
 
 -- predefined type, no DDL - XMLTYPE
 
-CREATE TABLE T_CoQQCCName 
+CREATE TABLE T_CoQ 
     ( 
-     ID                        NUMBER (10)  NOT NULL , 
-     Tenant_ID                 NUMBER (10) , 
-     Version                   NUMBER (10) , 
-     LanguageCode_ID           NUMBER (10)  NOT NULL , 
-     QualityCostCalculation_ID NUMBER (10)  NOT NULL , 
-     Title                     VARCHAR2 (512) , 
-     Description               VARCHAR2 (4000) , 
-     Notes                     VARCHAR2 (4000) , 
-     IsNotAutomatedTranslated  CHAR (1) , 
-     IsActive                  CHAR (1) , 
-     RowVersion                NUMBER (10) , 
-     CreatedOn                 TIMESTAMP WITH LOCAL TIME ZONE  NOT NULL , 
-     CreatedBy_ID              NUMBER (10)  NOT NULL , 
-     ChangedOn                 TIMESTAMP WITH LOCAL TIME ZONE , 
-     ChangedBy_ID              NUMBER (10) , 
-     DeletedOn                 TIMESTAMP WITH LOCAL TIME ZONE , 
-     DeletedBy_ID              NUMBER (10) , 
-     IsDeleted                 CHAR (1) 
+     ID                         NUMBER (10)  NOT NULL , 
+     Tenant_ID                  NUMBER (10) , 
+     Version                    NUMBER (10) , 
+     SessionID                  VARCHAR2 (128) , 
+     Title                      VARCHAR2 (255) , 
+     Revenue                    NUMBER (18,2)  NOT NULL , 
+     QualityPercentage          NUMBER (5,2)  NOT NULL , 
+     PreventionPercentage       NUMBER (5,2) , 
+     AppraisalPercentage        NUMBER (5,2) , 
+     InternalFailurePercentage  NUMBER (5,2) , 
+     ExternalFailurePercentage  NUMBER (5,2) , 
+     CalculatedCoGQ             NUMBER (18,2) , 
+     CalculatedCoPQ             NUMBER (18,2) , 
+     CalculatedTotalQualityCost NUMBER (18,2) , 
+     CalculatedPreventionCost   NUMBER (18,2) , 
+     CalculatedAppraisalCost    NUMBER (18,2) , 
+     CalculatedInternalFailCost NUMBER (18,2) , 
+     CalculatedExternalFailCost NUMBER (18,2) , 
+     CoGQRatio                  NUMBER (5,2) , 
+     CoPQRatio                  NUMBER (5,2) , 
+     QualityEfficiencyIndex     NUMBER (5,2) , 
+     CurrencyCode_ID            NUMBER (10)  NOT NULL , 
+     DisplayUnit_ID             NUMBER (10)  NOT NULL , 
+     OpportunityEnabled         CHAR (1) , 
+     LostSalesPercentage        NUMBER (5,2) , 
+     CustomerChurnPercentage    NUMBER (5,2) , 
+     MarketShareLossPercentage  NUMBER (5,2) , 
+     ProductivityLossPercentage NUMBER (5,2) , 
+     CalculatedTotalCost        NUMBER (18,2) , 
+     CalculatedOpportunityCost  NUMBER (18,2) , 
+     AnalysisDate               TIMESTAMP WITH LOCAL TIME ZONE , 
+     BenchmarkCategory          VARCHAR2 (50) , 
+     QualityMaturityLevel       NUMBER (1) , 
+     Notes                      VARCHAR2 (4000) , 
+     IsTemplate                 CHAR (1) , 
+     IsPublic                   CHAR (1) , 
+     IsActive                   CHAR (1) , 
+     RowVersion                 NUMBER (10) , 
+     CreatedOn                  TIMESTAMP WITH LOCAL TIME ZONE  NOT NULL , 
+     CreatedBy_ID               NUMBER (10)  NOT NULL , 
+     ChangedOn                  TIMESTAMP WITH LOCAL TIME ZONE , 
+     ChangedBy_ID               NUMBER (10) , 
+     DeletedOn                  TIMESTAMP WITH LOCAL TIME ZONE , 
+     DeletedBy_ID               NUMBER (10) , 
+     IsDeleted                  CHAR (1) 
     ) 
 ;
-CREATE INDEX T_CoQQualityCostCalcName_IDX ON T_CoQQCCName 
+CREATE INDEX T_CoQQualityCostCalc_IDX ON T_CoQ 
     ( 
      ID ASC , 
      Tenant_ID ASC , 
-     LanguageCode_ID ASC , 
-     QualityCostCalculation_ID ASC 
+     SessionID ASC , 
+     CreatedBy_ID ASC , 
+     IsDeleted ASC 
     ) 
 ;
 
-ALTER TABLE T_CoQQCCName 
-    ADD CONSTRAINT T_CoQQCCName_PK PRIMARY KEY ( ID ) ;
+ALTER TABLE T_CoQ 
+    ADD CONSTRAINT T_CoQ_PK PRIMARY KEY ( ID ) ;
 
-ALTER TABLE T_CoQQCCName 
-    ADD CONSTRAINT T_CoQQCCName_LangCode FOREIGN KEY 
+ALTER TABLE T_CoQ 
+    ADD CONSTRAINT T_CoQ_CurrCode FOREIGN KEY 
     ( 
-     LanguageCode_ID
+     CurrencyCode_ID
     ) 
     REFERENCES T_Constant 
     ( 
@@ -54,19 +82,19 @@ ALTER TABLE T_CoQQCCName
     ) 
 ;
 
-ALTER TABLE T_CoQQCCName 
-    ADD CONSTRAINT T_CoQQCCName_T_QCC_FK FOREIGN KEY 
+ALTER TABLE T_CoQ 
+    ADD CONSTRAINT T_CoQ_QuantUnitCode FOREIGN KEY 
     ( 
-     QualityCostCalculation_ID
+     DisplayUnit_ID
     ) 
-    REFERENCES T_CoQQCC 
+    REFERENCES T_Constant 
     ( 
      ID
     ) 
 ;
 
-ALTER TABLE T_CoQQCCName 
-    ADD CONSTRAINT T_CoQQCCName_T_Tenant_FK FOREIGN KEY 
+ALTER TABLE T_CoQ 
+    ADD CONSTRAINT T_CoQ_T_Tenant_FK FOREIGN KEY 
     ( 
      Tenant_ID
     ) 
@@ -76,8 +104,8 @@ ALTER TABLE T_CoQQCCName
     ) 
 ;
 
-ALTER TABLE T_CoQQCCName 
-    ADD CONSTRAINT T_CoQQCCName_T_User_FK FOREIGN KEY 
+ALTER TABLE T_CoQ 
+    ADD CONSTRAINT T_CoQ_T_User_FK FOREIGN KEY 
     ( 
      CreatedBy_ID
     ) 
@@ -87,8 +115,8 @@ ALTER TABLE T_CoQQCCName
     ) 
 ;
 
-ALTER TABLE T_CoQQCCName 
-    ADD CONSTRAINT T_CoQQCCName_T_User_FKv2 FOREIGN KEY 
+ALTER TABLE T_CoQ 
+    ADD CONSTRAINT T_CoQ_T_User_FKv2 FOREIGN KEY 
     ( 
      ChangedBy_ID
     ) 
@@ -98,8 +126,8 @@ ALTER TABLE T_CoQQCCName
     ) 
 ;
 
-ALTER TABLE T_CoQQCCName 
-    ADD CONSTRAINT T_CoQQCCName_T_User_FKv3 FOREIGN KEY 
+ALTER TABLE T_CoQ 
+    ADD CONSTRAINT T_CoQ_T_User_FKv3 FOREIGN KEY 
     ( 
      DeletedBy_ID
     ) 
@@ -109,25 +137,25 @@ ALTER TABLE T_CoQQCCName
     ) 
 ;
 
-CREATE SEQUENCE T_CoQQCCName_ID_SEQ 
+CREATE SEQUENCE T_CoQ_ID_SEQ 
 START WITH 1 
     NOCACHE 
     ORDER ;
 
-CREATE OR REPLACE TRIGGER T_CoQQCCName_ID_TRG 
-BEFORE INSERT ON T_CoQQCCName 
+CREATE OR REPLACE TRIGGER T_CoQ_ID_TRG 
+BEFORE INSERT ON T_CoQ 
 FOR EACH ROW 
 WHEN (NEW.ID IS NULL) 
 BEGIN 
-    :NEW.ID := T_CoQQCCName_ID_SEQ.NEXTVAL; 
+    :NEW.ID := T_CoQ_ID_SEQ.NEXTVAL; 
 END;
 /
 
--- T_CoQQCCName DDL Trigger Script
+-- T_CoQ DDL Trigger Script
 -- Oracle APEX Developer Template
 
-CREATE OR REPLACE TRIGGER TRG_T_CoQQCCName_BIU
-    BEFORE INSERT OR UPDATE ON T_CoQQCCName
+CREATE OR REPLACE TRIGGER TRG_T_CoQ_BIU
+    BEFORE INSERT OR UPDATE ON T_CoQ
     FOR EACH ROW
 DECLARE
     v_user_id NUMBER;
@@ -172,8 +200,21 @@ BEGIN
             :NEW.IsDeleted := 'N';
         END IF;
         
-        IF :NEW.IsNotAutomatedTranslated IS NULL THEN
-            :NEW.IsNotAutomatedTranslated := 'N';
+        IF :NEW.OpportunityEnabled IS NULL THEN
+            :NEW.OpportunityEnabled := 'N';
+        END IF;
+        
+        IF :NEW.IsTemplate IS NULL THEN
+            :NEW.IsTemplate := 'N';
+        END IF;
+        
+        IF :NEW.IsPublic IS NULL THEN
+            :NEW.IsPublic := 'N';
+        END IF;
+        
+        -- Set AnalysisDate if not provided
+        IF :NEW.AnalysisDate IS NULL THEN
+            :NEW.AnalysisDate := v_current_time;
         END IF;
     END IF;
 
@@ -199,12 +240,9 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         -- Log error and re-raise
-        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQQCCName_BIU: ' || SQLERRM);
-END TRG_T_CoQQCCName_BIU;
+        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQ_BIU: ' || SQLERRM);
+END TRG_T_CoQ_BIU;
 /
-
-COMMIT
-;
 
 
 

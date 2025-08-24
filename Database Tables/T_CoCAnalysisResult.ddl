@@ -1,5 +1,5 @@
 -- Generiert von Oracle SQL Developer Data Modeler 24.3.1.351.0831
---   am/um:        2025-08-24 08:06:54 MESZ
+--   am/um:        2025-08-24 10:01:14 MESZ
 --   Site:      Oracle Database 21c
 --   Typ:      Oracle Database 21c
 
@@ -9,7 +9,7 @@
 
 -- predefined type, no DDL - XMLTYPE
 
-CREATE TABLE T_CoQQCCAnalysisResult 
+CREATE TABLE T_CoQAnalysisResult 
     ( 
      ID                        NUMBER (10)  NOT NULL , 
      Tenant_ID                 NUMBER (10) , 
@@ -49,33 +49,33 @@ CREATE TABLE T_CoQQCCAnalysisResult
     ) 
 ;
 
-ALTER TABLE T_CoQQCCAnalysisResult 
+ALTER TABLE T_CoQAnalysisResult 
     ADD CONSTRAINT T_QCCAnalysis_Type_CHK 
     CHECK (AnalysisType IN ('BENCHMARK', 'EXTENDED', 'STANDARD')) 
 ;
-CREATE INDEX T_QCCAnalysisResult_Type_IDX ON T_CoQQCCAnalysisResult 
+CREATE INDEX T_CoQAnalysisResult_Type_IDX ON T_CoQAnalysisResult 
     ( 
      AnalysisType ASC , 
      CalculationTimestamp ASC 
     ) 
 ;
 
-ALTER TABLE T_CoQQCCAnalysisResult 
-    ADD CONSTRAINT T_CoQQCCAnalysisResult_PK PRIMARY KEY ( ID ) ;
+ALTER TABLE T_CoQAnalysisResult 
+    ADD CONSTRAINT T_CoQAnalysisResult_PK PRIMARY KEY ( ID ) ;
 
-ALTER TABLE T_CoQQCCAnalysisResult 
-    ADD CONSTRAINT T_CoQQCCAnResult_T_CoQQCC_FK FOREIGN KEY 
+ALTER TABLE T_CoQAnalysisResult 
+    ADD CONSTRAINT T_CoQAnResult_T_CoQQCC_FK FOREIGN KEY 
     ( 
      QualityCostCalculation_ID
     ) 
-    REFERENCES T_CoQQCC 
+    REFERENCES T_CoQ 
     ( 
      ID
     ) 
 ;
 
-ALTER TABLE T_CoQQCCAnalysisResult 
-    ADD CONSTRAINT T_CoQQCCAnResult_T_Tenant_FK FOREIGN KEY 
+ALTER TABLE T_CoQAnalysisResult 
+    ADD CONSTRAINT T_CoQAnResult_T_Tenant_FK FOREIGN KEY 
     ( 
      Tenant_ID
     ) 
@@ -85,8 +85,8 @@ ALTER TABLE T_CoQQCCAnalysisResult
     ) 
 ;
 
-ALTER TABLE T_CoQQCCAnalysisResult 
-    ADD CONSTRAINT T_CoQQCCAnResult_T_User_FK FOREIGN KEY 
+ALTER TABLE T_CoQAnalysisResult 
+    ADD CONSTRAINT T_CoQAnResult_T_User_FK FOREIGN KEY 
     ( 
      CreatedBy_ID
     ) 
@@ -96,8 +96,8 @@ ALTER TABLE T_CoQQCCAnalysisResult
     ) 
 ;
 
-ALTER TABLE T_CoQQCCAnalysisResult 
-    ADD CONSTRAINT T_CoQQCCAnResult_T_User_FKv2 FOREIGN KEY 
+ALTER TABLE T_CoQAnalysisResult 
+    ADD CONSTRAINT T_CoQAnResult_T_User_FKv2 FOREIGN KEY 
     ( 
      ChangedBy_ID
     ) 
@@ -107,8 +107,8 @@ ALTER TABLE T_CoQQCCAnalysisResult
     ) 
 ;
 
-ALTER TABLE T_CoQQCCAnalysisResult 
-    ADD CONSTRAINT T_CoQQCCAnResult_T_User_FKv3 FOREIGN KEY 
+ALTER TABLE T_CoQAnalysisResult 
+    ADD CONSTRAINT T_CoQAnResult_T_User_FKv3 FOREIGN KEY 
     ( 
      DeletedBy_ID
     ) 
@@ -118,25 +118,25 @@ ALTER TABLE T_CoQQCCAnalysisResult
     ) 
 ;
 
-CREATE SEQUENCE T_CoQQCCAnalysisResult_ID_SEQ 
+CREATE SEQUENCE T_CoQAnalysisResult_ID_SEQ 
 START WITH 1 
     NOCACHE 
     ORDER ;
 
-CREATE OR REPLACE TRIGGER T_CoQQCCAnalysisResult_ID_TRG 
-BEFORE INSERT ON T_CoQQCCAnalysisResult 
+CREATE OR REPLACE TRIGGER T_CoQAnalysisResult_ID_TRG 
+BEFORE INSERT ON T_CoQAnalysisResult 
 FOR EACH ROW 
 WHEN (NEW.ID IS NULL) 
 BEGIN 
-    :NEW.ID := T_CoQQCCAnalysisResult_ID_SEQ.NEXTVAL; 
+    :NEW.ID := T_CoQAnalysisResult_ID_SEQ.NEXTVAL; 
 END;
 /
 
--- T_CoQQCCAnalysisResult DDL Trigger Script
+-- T_CoQAnalysisResult DDL Trigger Script
 -- Oracle APEX Developer Template
 
-CREATE OR REPLACE TRIGGER TRG_T_CoQQCCAnalysisResult_BIU
-    BEFORE INSERT OR UPDATE ON T_CoQQCCAnalysisResult
+CREATE OR REPLACE TRIGGER TRG_T_CoQAnalysisResult_BIU
+    BEFORE INSERT OR UPDATE ON T_CoQAnalysisResult
     FOR EACH ROW
 DECLARE
     v_user_id NUMBER;
@@ -202,9 +202,12 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         -- Log error and re-raise
-        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQQCCAnalysisResult_BIU: ' || SQLERRM);
-END TRG_T_CoQQCCAnalysisResult_BIU;
+        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQAnalysisResult_BIU: ' || SQLERRM);
+END TRG_T_CoQAnalysisResult_BIU;
 /
+
+COMMIT
+;
 
 
 

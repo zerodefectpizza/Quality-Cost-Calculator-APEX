@@ -1,5 +1,5 @@
 -- Generiert von Oracle SQL Developer Data Modeler 24.3.1.351.0831
---   am/um:        2025-08-24 08:08:01 MESZ
+--   am/um:        2025-08-24 10:01:45 MESZ
 --   Site:      Oracle Database 21c
 --   Typ:      Oracle Database 21c
 
@@ -9,7 +9,7 @@
 
 -- predefined type, no DDL - XMLTYPE
 
-CREATE TABLE T_CoQQCCBenchmark 
+CREATE TABLE T_CoQBenchmark 
     ( 
      ID                    NUMBER (10)  NOT NULL , 
      Tenant_ID             NUMBER (10) , 
@@ -39,7 +39,7 @@ CREATE TABLE T_CoQQCCBenchmark
      IsDeleted             CHAR (1) 
     ) 
 ;
-CREATE INDEX T_QCCBenchmark_Industry_IDX ON T_CoQQCCBenchmark 
+CREATE INDEX T_CoQBenchmark_Industry_IDX ON T_CoQBenchmark 
     ( 
      IndustryCode_ID ASC , 
      CompanySize ASC , 
@@ -47,11 +47,11 @@ CREATE INDEX T_QCCBenchmark_Industry_IDX ON T_CoQQCCBenchmark
     ) 
 ;
 
-ALTER TABLE T_CoQQCCBenchmark 
-    ADD CONSTRAINT T_CoQQCCBenchmark_PK PRIMARY KEY ( ID ) ;
+ALTER TABLE T_CoQBenchmark 
+    ADD CONSTRAINT T_CoQBenchmark_PK PRIMARY KEY ( ID ) ;
 
-ALTER TABLE T_CoQQCCBenchmark 
-    ADD CONSTRAINT T_CoQQCCBmark_T_IndCode FOREIGN KEY 
+ALTER TABLE T_CoQBenchmark 
+    ADD CONSTRAINT T_CoQBmark_T_IndCode FOREIGN KEY 
     ( 
      IndustryCode_ID
     ) 
@@ -61,8 +61,8 @@ ALTER TABLE T_CoQQCCBenchmark
     ) 
 ;
 
-ALTER TABLE T_CoQQCCBenchmark 
-    ADD CONSTRAINT T_CoQQCCBmark_T_Tenant_FK FOREIGN KEY 
+ALTER TABLE T_CoQBenchmark 
+    ADD CONSTRAINT T_CoQBmark_T_Tenant_FK FOREIGN KEY 
     ( 
      Tenant_ID
     ) 
@@ -72,8 +72,8 @@ ALTER TABLE T_CoQQCCBenchmark
     ) 
 ;
 
-ALTER TABLE T_CoQQCCBenchmark 
-    ADD CONSTRAINT T_CoQQCCBmark_T_User_FK FOREIGN KEY 
+ALTER TABLE T_CoQBenchmark 
+    ADD CONSTRAINT T_CoQBmark_T_User_FK FOREIGN KEY 
     ( 
      CreatedBy_ID
     ) 
@@ -83,8 +83,8 @@ ALTER TABLE T_CoQQCCBenchmark
     ) 
 ;
 
-ALTER TABLE T_CoQQCCBenchmark 
-    ADD CONSTRAINT T_CoQQCCBmark_T_User_FKv2 FOREIGN KEY 
+ALTER TABLE T_CoQBenchmark 
+    ADD CONSTRAINT T_CoQBmark_T_User_FKv2 FOREIGN KEY 
     ( 
      ChangedBy_ID
     ) 
@@ -94,8 +94,8 @@ ALTER TABLE T_CoQQCCBenchmark
     ) 
 ;
 
-ALTER TABLE T_CoQQCCBenchmark 
-    ADD CONSTRAINT T_CoQQCCBmark_T_User_FKv3 FOREIGN KEY 
+ALTER TABLE T_CoQBenchmark 
+    ADD CONSTRAINT T_CoQBmark_T_User_FKv3 FOREIGN KEY 
     ( 
      DeletedBy_ID
     ) 
@@ -105,25 +105,25 @@ ALTER TABLE T_CoQQCCBenchmark
     ) 
 ;
 
-CREATE SEQUENCE T_CoQQCCBenchmark_ID_SEQ 
+CREATE SEQUENCE T_CoQBenchmark_ID_SEQ 
 START WITH 1 
     NOCACHE 
     ORDER ;
 
-CREATE OR REPLACE TRIGGER T_CoQQCCBenchmark_ID_TRG 
-BEFORE INSERT ON T_CoQQCCBenchmark 
+CREATE OR REPLACE TRIGGER T_CoQBenchmark_ID_TRG 
+BEFORE INSERT ON T_CoQBenchmark 
 FOR EACH ROW 
 WHEN (NEW.ID IS NULL) 
 BEGIN 
-    :NEW.ID := T_CoQQCCBenchmark_ID_SEQ.NEXTVAL; 
+    :NEW.ID := T_CoQBenchmark_ID_SEQ.NEXTVAL; 
 END;
 /
 
--- T_CoQQCCBenchmark DDL Trigger Script
+-- T_CoQBenchmark DDL Trigger Script
 -- Oracle APEX Developer Template
 
-CREATE OR REPLACE TRIGGER TRG_T_CoQQCCBenchmark_BIU
-    BEFORE INSERT OR UPDATE ON T_CoQQCCBenchmark
+CREATE OR REPLACE TRIGGER TRG_T_CoQBenchmark_BIU
+    BEFORE INSERT OR UPDATE ON T_CoQBenchmark
     FOR EACH ROW
 DECLARE
     v_user_id NUMBER;
@@ -195,8 +195,8 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         -- Log error and re-raise
-        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQQCCBenchmark_BIU: ' || SQLERRM);
-END TRG_T_CoQQCCBenchmark_BIU;
+        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQBenchmark_BIU: ' || SQLERRM);
+END TRG_T_CoQBenchmark_BIU;
 /
 
 

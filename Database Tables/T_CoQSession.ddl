@@ -1,5 +1,5 @@
 -- Generiert von Oracle SQL Developer Data Modeler 24.3.1.351.0831
---   am/um:        2025-08-24 08:09:24 MESZ
+--   am/um:        2025-08-24 10:02:48 MESZ
 --   Site:      Oracle Database 21c
 --   Typ:      Oracle Database 21c
 
@@ -9,7 +9,7 @@
 
 -- predefined type, no DDL - XMLTYPE
 
-CREATE TABLE T_CoQQCCSession 
+CREATE TABLE T_CoQSession 
     ( 
      ID           NUMBER (10)  NOT NULL , 
      Tenant_ID    NUMBER (10) , 
@@ -32,17 +32,17 @@ CREATE TABLE T_CoQQCCSession
      IsDeleted    CHAR (1) 
     ) 
 ;
-CREATE UNIQUE INDEX T_QCCSession_SessionID_IDX ON T_CoQQCCSession 
+CREATE UNIQUE INDEX T_CoQSession_SessionID_IDX ON T_CoQSession 
     ( 
      SessionID ASC 
     ) 
 ;
 
-ALTER TABLE T_CoQQCCSession 
-    ADD CONSTRAINT T_CoQQCCSession_PK PRIMARY KEY ( ID ) ;
+ALTER TABLE T_CoQSession 
+    ADD CONSTRAINT T_CoQSession_PK PRIMARY KEY ( ID ) ;
 
-ALTER TABLE T_CoQQCCSession 
-    ADD CONSTRAINT T_CoQQCCSess_T_Tenant_FK FOREIGN KEY 
+ALTER TABLE T_CoQSession 
+    ADD CONSTRAINT T_CoQSession_T_Tenant_FK FOREIGN KEY 
     ( 
      Tenant_ID
     ) 
@@ -52,25 +52,25 @@ ALTER TABLE T_CoQQCCSession
     ) 
 ;
 
-CREATE SEQUENCE T_CoQQCCSession_ID_SEQ 
+CREATE SEQUENCE T_CoQSession_ID_SEQ 
 START WITH 1 
     NOCACHE 
     ORDER ;
 
-CREATE OR REPLACE TRIGGER T_CoQQCCSession_ID_TRG 
-BEFORE INSERT ON T_CoQQCCSession 
+CREATE OR REPLACE TRIGGER T_CoQSession_ID_TRG 
+BEFORE INSERT ON T_CoQSession 
 FOR EACH ROW 
 WHEN (NEW.ID IS NULL) 
 BEGIN 
-    :NEW.ID := T_CoQQCCSession_ID_SEQ.NEXTVAL; 
+    :NEW.ID := T_CoQSession_ID_SEQ.NEXTVAL; 
 END;
 /
 
--- T_CoQQCCSession DDL Trigger Script
+-- T_CoQSession DDL Trigger Script
 -- Oracle APEX Developer Template
 
-CREATE OR REPLACE TRIGGER TRG_T_CoQQCCSession_BIU
-    BEFORE INSERT OR UPDATE ON T_CoQQCCSession
+CREATE OR REPLACE TRIGGER TRG_T_CoQSession_BIU
+    BEFORE INSERT OR UPDATE ON T_CoQSession
     FOR EACH ROW
 DECLARE
     v_user_id NUMBER;
@@ -154,12 +154,9 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         -- Log error and re-raise
-        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQQCCSession_BIU: ' || SQLERRM);
-END TRG_T_CoQQCCSession_BIU;
+        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQSession_BIU: ' || SQLERRM);
+END TRG_T_CoQSession_BIU;
 /
-
-COMMIT
-;
 
 
 
