@@ -1,5 +1,5 @@
 -- Generiert von Oracle SQL Developer Data Modeler 24.3.1.351.0831
---   am/um:        2025-08-23 15:01:25 MESZ
+--   am/um:        2025-08-24 08:05:58 MESZ
 --   Site:      Oracle Database 21c
 --   Typ:      Oracle Database 21c
 
@@ -57,7 +57,6 @@ CREATE TABLE T_CoQQCC
      DeletedBy_ID               NUMBER (10) , 
      IsDeleted                  CHAR (1) 
     ) 
-    LOGGING 
 ;
 CREATE INDEX T_CoQQualityCostCalc_IDX ON T_CoQQCC 
     ( 
@@ -67,7 +66,6 @@ CREATE INDEX T_CoQQualityCostCalc_IDX ON T_CoQQCC
      CreatedBy_ID ASC , 
      IsDeleted ASC 
     ) 
-    LOGGING 
 ;
 
 ALTER TABLE T_CoQQCC 
@@ -82,7 +80,6 @@ ALTER TABLE T_CoQQCC
     ( 
      ID
     ) 
-    NOT DEFERRABLE 
 ;
 
 ALTER TABLE T_CoQQCC 
@@ -94,7 +91,6 @@ ALTER TABLE T_CoQQCC
     ( 
      ID
     ) 
-    NOT DEFERRABLE 
 ;
 
 ALTER TABLE T_CoQQCC 
@@ -106,7 +102,6 @@ ALTER TABLE T_CoQQCC
     ( 
      ID
     ) 
-    NOT DEFERRABLE 
 ;
 
 ALTER TABLE T_CoQQCC 
@@ -118,7 +113,6 @@ ALTER TABLE T_CoQQCC
     ( 
      ID
     ) 
-    NOT DEFERRABLE 
 ;
 
 ALTER TABLE T_CoQQCC 
@@ -130,7 +124,6 @@ ALTER TABLE T_CoQQCC
     ( 
      ID
     ) 
-    NOT DEFERRABLE 
 ;
 
 ALTER TABLE T_CoQQCC 
@@ -142,140 +135,6 @@ ALTER TABLE T_CoQQCC
     ( 
      ID
     ) 
-    NOT DEFERRABLE 
-;
-
-CREATE OR REPLACE VIEW V_CoQQCCAnalysis ( ID, Tenant_ID, Version, SessionID, Title, Revenue, QualityPercentage, PreventionPercentage, AppraisalPercentage, InternalFailurePercentage, ExternalFailurePercentage, TotalQualityCost, CoGQTotal, CoPQTotal, QualityEfficiencyIndex, CurrencyCode_ID, DisplayUnit_ID, OpportunityEnabled, CreatedOn, CreatedBy_ID ) AS
-SELECT 
-    qcc.ID,
-    qcc.Tenant_ID,
-    qcc.Version,
-    qcc.SessionID,
-    qcc.Title,
-    qcc.Revenue,
-    qcc.QualityPercentage,
-    qcc.PreventionPercentage,
-    qcc.AppraisalPercentage,
-    qcc.InternalFailurePercentage,
-    qcc.ExternalFailurePercentage,
-    COALESCE(qcc.CalculatedTotalQualityCost, (qcc.Revenue * qcc.QualityPercentage / 100)) as TotalQualityCost,
-    COALESCE(qcc.CalculatedCoGQ, (qcc.Revenue * qcc.QualityPercentage / 100 * (qcc.PreventionPercentage + qcc.AppraisalPercentage) / 100)) as CoGQTotal,
-    COALESCE(qcc.CalculatedCoPQ, (qcc.Revenue * qcc.QualityPercentage / 100 * (qcc.InternalFailurePercentage + qcc.ExternalFailurePercentage) / 100)) as CoPQTotal,
-    COALESCE(qcc.QualityEfficiencyIndex, CASE WHEN (qcc.InternalFailurePercentage + qcc.ExternalFailurePercentage) > 0 THEN ROUND((qcc.PreventionPercentage + qcc.AppraisalPercentage) / (qcc.InternalFailurePercentage + qcc.ExternalFailurePercentage), 4) ELSE NULL END) as QualityEfficiencyIndex,
-    qcc.CurrencyCode_ID,
-    qcc.DisplayUnit_ID,
-    qcc.OpportunityEnabled,
-    qcc.CreatedOn,
-    qcc.CreatedBy_ID
-FROM T_CoQQCC qcc
-WHERE qcc.IsDeleted = '0' 
-;
-
-CREATE OR REPLACE VIEW V_CoQQCCBenchmarkComparison ( ID, Title, CoGQTotal, CoPQTotal, IndustryAvgCoGQPct, IndustryAvgCoPQPct, BestPracticeCoGQPct, BestPracticeCoPQPct, CoGQVarianceFromAvg, CoGQPerformanceRating, CreatedOn ) AS
-SELECT 
-    qca.ID,
-    qca.Title,
-    qca.CoGQTotal,
-    qca.CoPQTotal,
-    bench.IndustryAvgCoGQPct,
-    bench.IndustryAvgCoPQPct,
-    bench.BestPracticeCoGQPct,
-    bench.BestPracticeCoPQPct,
-    (qca.PreventionPercentage + qca.AppraisalPercentage - bench.IndustryAvgCoGQPct) as CoGQVarianceFromAvg,
-    CASE 
-        WHEN (qca.PreventionPercentage + qca.AppraisalPercentage) >= bench.BestPracticeCoGQPct THEN 'BEST_PRACTICE'
-        WHEN (qca.PreventionPercentage + qca.AppraisalPercentage) >= bench.IndustryAvgCoGQPct THEN 'ABOVE_AVERAGE'
-        ELSE 'BELOW_AVERAGE'
-    END as CoGQPerformanceRating,
-    qca.CreatedOn
-FROM V_CoQQCCAnalysis qca
-LEFT JOIN T_CoQQCCBenchmark bench ON bench.IsActive = '1' AND bench.IsDeleted = '0' 
-;
-
-CREATE OR REPLACE VIEW V_CoQQCCChartData ( ID, Title, Prevention_Pct, Appraisal_Pct, InternalFailure_Pct, ExternalFailure_Pct, GoodQuality_Value, PoorQuality_Value, Prevention_Label, Appraisal_Label, InternalFailure_Label, ExternalFailure_Label, CreatedOn ) AS
-SELECT 
-    qca.ID,
-    qca.Title,
-    qca.PreventionPercentage as Prevention_Pct,
-    qca.AppraisalPercentage as Appraisal_Pct,
-    qca.InternalFailurePercentage as InternalFailure_Pct,
-    qca.ExternalFailurePercentage as ExternalFailure_Pct,
-    qca.CoGQTotal as GoodQuality_Value,
-    qca.CoPQTotal as PoorQuality_Value,
-    'Prevention' as Prevention_Label,
-    'Appraisal' as Appraisal_Label,
-    'Internal Failure' as InternalFailure_Label,
-    'External Failure' as ExternalFailure_Label,
-    qca.CreatedOn
-FROM V_CoQQCCAnalysis qca 
-;
-
-CREATE OR REPLACE VIEW V_CoQQCCDashboardSummary ( ID, Title, Revenue, TotalQualityCost, CoGQTotal, CoPQTotal, QualityEfficiencyIndex, QualityMaturityLevel, PrimaryRecommendation, CreatedOn ) AS
-SELECT 
-    qca.ID,
-    qca.Title,
-    qca.Revenue,
-    qca.TotalQualityCost,
-    qca.CoGQTotal,
-    qca.CoPQTotal,
-    qca.QualityEfficiencyIndex,
-    CASE 
-        WHEN (qca.PreventionPercentage + qca.AppraisalPercentage) >= 60 THEN 'EXCELLENT'
-        WHEN (qca.PreventionPercentage + qca.AppraisalPercentage) >= 40 THEN 'GOOD'
-        WHEN (qca.PreventionPercentage + qca.AppraisalPercentage) >= 25 THEN 'AVERAGE'
-        ELSE 'POOR'
-    END as QualityMaturityLevel,
-    CASE 
-        WHEN qca.PreventionPercentage < 15 THEN 'Increase prevention investments'
-        WHEN qca.ExternalFailurePercentage > 30 THEN 'Focus on customer quality'
-        ELSE 'Maintain current approach'
-    END as PrimaryRecommendation,
-    qca.CreatedOn
-FROM V_CoQQCCAnalysis qca 
-;
-
-CREATE OR REPLACE VIEW V_CoQQCCMultilingual ( ID, Revenue, QualityPercentage, LanguageCode_ID, LocalizedTitle, LocalizedDescription, TotalQualityCost, CoGQTotal, CoPQTotal, CurrencyCode_ID, DisplayUnit_ID, CreatedOn ) AS
-SELECT 
-    qcc.ID,
-    qcc.Revenue,
-    qcc.QualityPercentage,
-    qccn.LanguageCode_ID,
-    COALESCE(qccn.Title, qcc.Title) as LocalizedTitle,
-    qccn.Description as LocalizedDescription,
-    qca.TotalQualityCost,
-    qca.CoGQTotal,
-    qca.CoPQTotal,
-    qcc.CurrencyCode_ID,
-    qcc.DisplayUnit_ID,
-    qcc.CreatedOn
-FROM T_CoQQCC qcc
-LEFT JOIN T_CoQQCCName qccn ON qcc.ID = qccn.QualityCostCalculation_ID AND qccn.IsDeleted = '0'
-LEFT JOIN V_CoQQCCAnalysis qca ON qcc.ID = qca.ID
-WHERE qcc.IsDeleted = '0' 
-;
-
-CREATE OR REPLACE VIEW V_CoQQCCSessionAnalytics ( SessionID, LanguageCode, CurrencyCode, DisplayUnit, SessionStart, LastActivity, CalculationsCount, AvgQualityCost, AvgEfficiency, UserType, UserAgent ) AS
-SELECT 
-    sess.SessionID,
-    sess.LanguageCode,
-    sess.CurrencyCode,
-    sess.DisplayUnit,
-    sess.CreatedOn as SessionStart,
-    sess.LastActivity,
-    COUNT(qcc.ID) as CalculationsCount,
-    AVG(qca.TotalQualityCost) as AvgQualityCost,
-    AVG(qca.QualityEfficiencyIndex) as AvgEfficiency,
-    CASE 
-        WHEN COUNT(qcc.ID) > 5 THEN 'POWER_USER'
-        WHEN COUNT(qcc.ID) > 1 THEN 'REGULAR_USER'
-        ELSE 'CASUAL_USER'
-    END as UserType,
-    sess.UserAgent
-FROM T_CoQQCCSession sess
-LEFT JOIN T_CoQQCC qcc ON sess.SessionID = qcc.SessionID
-LEFT JOIN V_CoQQCCAnalysis qca ON qcc.ID = qca.ID
-WHERE sess.IsDeleted = '0'
-GROUP BY sess.SessionID, sess.LanguageCode, sess.CurrencyCode, sess.DisplayUnit, sess.CreatedOn, sess.LastActivity, sess.UserAgent 
 ;
 
 CREATE SEQUENCE T_CoQQCC_ID_SEQ 
@@ -392,7 +251,7 @@ END TRG_T_CoQQCC_BIU;
 -- CREATE TABLE                             1
 -- CREATE INDEX                             1
 -- ALTER TABLE                              7
--- CREATE VIEW                              6
+-- CREATE VIEW                              0
 -- ALTER VIEW                               0
 -- CREATE PACKAGE                           0
 -- CREATE PACKAGE BODY                      0

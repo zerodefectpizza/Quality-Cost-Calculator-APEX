@@ -1,5 +1,5 @@
 -- Generiert von Oracle SQL Developer Data Modeler 24.3.1.351.0831
---   am/um:        2025-08-24 08:09:24 MESZ
+--   am/um:        2025-08-24 08:08:31 MESZ
 --   Site:      Oracle Database 21c
 --   Typ:      Oracle Database 21c
 
@@ -9,40 +9,64 @@
 
 -- predefined type, no DDL - XMLTYPE
 
-CREATE TABLE T_CoQQCCSession 
+CREATE TABLE T_CoQQCCName 
     ( 
-     ID           NUMBER (10)  NOT NULL , 
-     Tenant_ID    NUMBER (10) , 
-     Version      NUMBER (10) , 
-     SessionID    VARCHAR2 (128)  NOT NULL , 
-     UserAgent    VARCHAR2 (512) , 
-     IPAddress    VARCHAR2 (45) , 
-     LanguageCode VARCHAR2 (5) , 
-     CurrencyCode VARCHAR2 (5) , 
-     DisplayUnit  VARCHAR2 (10) DEFAULT 'MILLION' , 
-     LastActivity TIMESTAMP WITH LOCAL TIME ZONE , 
-     ExpiresOn    TIMESTAMP WITH LOCAL TIME ZONE , 
-     IsActive     CHAR (1) , 
-     CreatedOn    TIMESTAMP WITH LOCAL TIME ZONE  NOT NULL , 
-     CreatedBy_ID NUMBER (10) , 
-     ChangedOn    TIMESTAMP WITH LOCAL TIME ZONE , 
-     ChangedBy_ID NUMBER (10) , 
-     DeletedOn    TIMESTAMP WITH LOCAL TIME ZONE , 
-     DeletedBy_ID NUMBER (10) , 
-     IsDeleted    CHAR (1) 
+     ID                        NUMBER (10)  NOT NULL , 
+     Tenant_ID                 NUMBER (10) , 
+     Version                   NUMBER (10) , 
+     LanguageCode_ID           NUMBER (10)  NOT NULL , 
+     QualityCostCalculation_ID NUMBER (10)  NOT NULL , 
+     Title                     VARCHAR2 (512) , 
+     Description               VARCHAR2 (4000) , 
+     Notes                     VARCHAR2 (4000) , 
+     IsNotAutomatedTranslated  CHAR (1) , 
+     IsActive                  CHAR (1) , 
+     RowVersion                NUMBER (10) , 
+     CreatedOn                 TIMESTAMP WITH LOCAL TIME ZONE  NOT NULL , 
+     CreatedBy_ID              NUMBER (10)  NOT NULL , 
+     ChangedOn                 TIMESTAMP WITH LOCAL TIME ZONE , 
+     ChangedBy_ID              NUMBER (10) , 
+     DeletedOn                 TIMESTAMP WITH LOCAL TIME ZONE , 
+     DeletedBy_ID              NUMBER (10) , 
+     IsDeleted                 CHAR (1) 
     ) 
 ;
-CREATE UNIQUE INDEX T_QCCSession_SessionID_IDX ON T_CoQQCCSession 
+CREATE INDEX T_CoQQualityCostCalcName_IDX ON T_CoQQCCName 
     ( 
-     SessionID ASC 
+     ID ASC , 
+     Tenant_ID ASC , 
+     LanguageCode_ID ASC , 
+     QualityCostCalculation_ID ASC 
     ) 
 ;
 
-ALTER TABLE T_CoQQCCSession 
-    ADD CONSTRAINT T_CoQQCCSession_PK PRIMARY KEY ( ID ) ;
+ALTER TABLE T_CoQQCCName 
+    ADD CONSTRAINT T_CoQQCCName_PK PRIMARY KEY ( ID ) ;
 
-ALTER TABLE T_CoQQCCSession 
-    ADD CONSTRAINT T_CoQQCCSess_T_Tenant_FK FOREIGN KEY 
+ALTER TABLE T_CoQQCCName 
+    ADD CONSTRAINT T_CoQQCCName_LangCode FOREIGN KEY 
+    ( 
+     LanguageCode_ID
+    ) 
+    REFERENCES T_Constant 
+    ( 
+     ID
+    ) 
+;
+
+ALTER TABLE T_CoQQCCName 
+    ADD CONSTRAINT T_CoQQCCName_T_QCC_FK FOREIGN KEY 
+    ( 
+     QualityCostCalculation_ID
+    ) 
+    REFERENCES T_CoQQCC 
+    ( 
+     ID
+    ) 
+;
+
+ALTER TABLE T_CoQQCCName 
+    ADD CONSTRAINT T_CoQQCCName_T_Tenant_FK FOREIGN KEY 
     ( 
      Tenant_ID
     ) 
@@ -52,25 +76,58 @@ ALTER TABLE T_CoQQCCSession
     ) 
 ;
 
-CREATE SEQUENCE T_CoQQCCSession_ID_SEQ 
+ALTER TABLE T_CoQQCCName 
+    ADD CONSTRAINT T_CoQQCCName_T_User_FK FOREIGN KEY 
+    ( 
+     CreatedBy_ID
+    ) 
+    REFERENCES T_User 
+    ( 
+     ID
+    ) 
+;
+
+ALTER TABLE T_CoQQCCName 
+    ADD CONSTRAINT T_CoQQCCName_T_User_FKv2 FOREIGN KEY 
+    ( 
+     ChangedBy_ID
+    ) 
+    REFERENCES T_User 
+    ( 
+     ID
+    ) 
+;
+
+ALTER TABLE T_CoQQCCName 
+    ADD CONSTRAINT T_CoQQCCName_T_User_FKv3 FOREIGN KEY 
+    ( 
+     DeletedBy_ID
+    ) 
+    REFERENCES T_User 
+    ( 
+     ID
+    ) 
+;
+
+CREATE SEQUENCE T_CoQQCCName_ID_SEQ 
 START WITH 1 
     NOCACHE 
     ORDER ;
 
-CREATE OR REPLACE TRIGGER T_CoQQCCSession_ID_TRG 
-BEFORE INSERT ON T_CoQQCCSession 
+CREATE OR REPLACE TRIGGER T_CoQQCCName_ID_TRG 
+BEFORE INSERT ON T_CoQQCCName 
 FOR EACH ROW 
 WHEN (NEW.ID IS NULL) 
 BEGIN 
-    :NEW.ID := T_CoQQCCSession_ID_SEQ.NEXTVAL; 
+    :NEW.ID := T_CoQQCCName_ID_SEQ.NEXTVAL; 
 END;
 /
 
--- T_CoQQCCSession DDL Trigger Script
+-- T_CoQQCCName DDL Trigger Script
 -- Oracle APEX Developer Template
 
-CREATE OR REPLACE TRIGGER TRG_T_CoQQCCSession_BIU
-    BEFORE INSERT OR UPDATE ON T_CoQQCCSession
+CREATE OR REPLACE TRIGGER TRG_T_CoQQCCName_BIU
+    BEFORE INSERT OR UPDATE ON T_CoQQCCName
     FOR EACH ROW
 DECLARE
     v_user_id NUMBER;
@@ -99,9 +156,12 @@ BEGIN
 
     -- Handle INSERT operations
     IF INSERTING THEN
-        -- Set CreatedOn and CreatedBy_ID (Note: CreatedBy_ID is nullable in this table)
+        -- Set CreatedOn and CreatedBy_ID
         :NEW.CreatedOn := v_current_time;
         :NEW.CreatedBy_ID := v_user_id;
+        
+        -- Initialize RowVersion
+        :NEW.RowVersion := 1;
         
         -- Set default values if not provided (using Y/N for boolean fields)
         IF :NEW.IsActive IS NULL THEN
@@ -112,50 +172,35 @@ BEGIN
             :NEW.IsDeleted := 'N';
         END IF;
         
-        IF :NEW.LanguageCode IS NULL THEN
-            :NEW.LanguageCode := 'EN';
-        END IF;
-        
-        IF :NEW.CurrencyCode IS NULL THEN
-            :NEW.CurrencyCode := 'EUR';
-        END IF;
-        
-        IF :NEW.DisplayUnit IS NULL THEN
-            :NEW.DisplayUnit := 'MILLION';
-        END IF;
-        
-        -- Set LastActivity and ExpiresOn if not provided
-        IF :NEW.LastActivity IS NULL THEN
-            :NEW.LastActivity := v_current_time;
-        END IF;
-        
-        IF :NEW.ExpiresOn IS NULL THEN
-            -- Set expiration to 24 hours from now by default
-            :NEW.ExpiresOn := v_current_time + INTERVAL '1' DAY;
+        IF :NEW.IsNotAutomatedTranslated IS NULL THEN
+            :NEW.IsNotAutomatedTranslated := 'N';
         END IF;
     END IF;
 
     -- Handle UPDATE operations
     IF UPDATING THEN
+        -- Increment RowVersion
+        :NEW.RowVersion := NVL(:OLD.RowVersion, 0) + 1;
+        
         -- Set ChangedOn and ChangedBy_ID
         :NEW.ChangedOn := v_current_time;
         :NEW.ChangedBy_ID := v_user_id;
-        
-        -- Update LastActivity on any update
-        :NEW.LastActivity := v_current_time;
         
         -- Preserve original creation audit fields
         :NEW.CreatedOn := :OLD.CreatedOn;
         :NEW.CreatedBy_ID := :OLD.CreatedBy_ID;
     END IF;
 
-    -- Note: No validation for CreatedBy_ID since it's nullable for session records
+    -- Validate required fields
+    IF :NEW.CreatedBy_ID IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20001, 'CreatedBy_ID cannot be null. User not found in T_USER table for user: ' || NVL(wwv_flow.g_user, USER));
+    END IF;
 
 EXCEPTION
     WHEN OTHERS THEN
         -- Log error and re-raise
-        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQQCCSession_BIU: ' || SQLERRM);
-END TRG_T_CoQQCCSession_BIU;
+        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQQCCName_BIU: ' || SQLERRM);
+END TRG_T_CoQQCCName_BIU;
 /
 
 COMMIT
@@ -167,7 +212,7 @@ COMMIT
 -- 
 -- CREATE TABLE                             1
 -- CREATE INDEX                             1
--- ALTER TABLE                              2
+-- ALTER TABLE                              7
 -- CREATE VIEW                              0
 -- ALTER VIEW                               0
 -- CREATE PACKAGE                           0
