@@ -1,5 +1,5 @@
 -- Generiert von Oracle SQL Developer Data Modeler 24.3.1.351.0831
---   am/um:        2025-08-24 10:00:22 MESZ
+--   am/um:        2025-08-24 16:45:36 MESZ
 --   Site:      Oracle Database 21c
 --   Typ:      Oracle Database 21c
 
@@ -9,72 +9,53 @@
 
 -- predefined type, no DDL - XMLTYPE
 
-CREATE TABLE T_CoQ 
+CREATE TABLE T_CoQCostTypeName 
     ( 
-     ID                         NUMBER (10)  NOT NULL , 
-     Tenant_ID                  NUMBER (10) , 
-     Version                    NUMBER (10) , 
-     SessionID                  VARCHAR2 (128) , 
-     Title                      VARCHAR2 (255) , 
-     Revenue                    NUMBER (18,2)  NOT NULL , 
-     QualityPercentage          NUMBER (5,2)  NOT NULL , 
-     PreventionPercentage       NUMBER (5,2) , 
-     AppraisalPercentage        NUMBER (5,2) , 
-     InternalFailurePercentage  NUMBER (5,2) , 
-     ExternalFailurePercentage  NUMBER (5,2) , 
-     CalculatedCoGQ             NUMBER (18,2) , 
-     CalculatedCoPQ             NUMBER (18,2) , 
-     CalculatedTotalQualityCost NUMBER (18,2) , 
-     CalculatedPreventionCost   NUMBER (18,2) , 
-     CalculatedAppraisalCost    NUMBER (18,2) , 
-     CalculatedInternalFailCost NUMBER (18,2) , 
-     CalculatedExternalFailCost NUMBER (18,2) , 
-     CoGQRatio                  NUMBER (5,2) , 
-     CoPQRatio                  NUMBER (5,2) , 
-     QualityEfficiencyIndex     NUMBER (5,2) , 
-     CurrencyCode_ID            NUMBER (10)  NOT NULL , 
-     DisplayUnit_ID             NUMBER (10)  NOT NULL , 
-     OpportunityEnabled         CHAR (1) , 
-     LostSalesPercentage        NUMBER (5,2) , 
-     CustomerChurnPercentage    NUMBER (5,2) , 
-     MarketShareLossPercentage  NUMBER (5,2) , 
-     ProductivityLossPercentage NUMBER (5,2) , 
-     CalculatedTotalCost        NUMBER (18,2) , 
-     CalculatedOpportunityCost  NUMBER (18,2) , 
-     AnalysisDate               TIMESTAMP WITH LOCAL TIME ZONE , 
-     BenchmarkCategory          VARCHAR2 (50) , 
-     QualityMaturityLevel       NUMBER (1) , 
-     Notes                      VARCHAR2 (4000) , 
-     IsTemplate                 CHAR (1) , 
-     IsPublic                   CHAR (1) , 
-     IsActive                   CHAR (1) , 
-     RowVersion                 NUMBER (10) , 
-     CreatedOn                  TIMESTAMP WITH LOCAL TIME ZONE  NOT NULL , 
-     CreatedBy_ID               NUMBER (10)  NOT NULL , 
-     ChangedOn                  TIMESTAMP WITH LOCAL TIME ZONE , 
-     ChangedBy_ID               NUMBER (10) , 
-     DeletedOn                  TIMESTAMP WITH LOCAL TIME ZONE , 
-     DeletedBy_ID               NUMBER (10) , 
-     IsDeleted                  CHAR (1) 
+     ID                       NUMBER (10)  NOT NULL , 
+     Tenant_ID                NUMBER (10) , 
+     LanguageCode_ID          NUMBER (10)  NOT NULL , 
+     CoQCostType_ID           NUMBER (10)  NOT NULL , 
+     Code                     VARCHAR2 (128) , 
+     Name                     VARCHAR2 (1024)  NOT NULL , 
+     Description              VARCHAR2 (4096) , 
+     Tags                     VARCHAR2 (4096) , 
+     BusinessTerm             VARCHAR2 (255) , 
+     TechnicalTerm            VARCHAR2 (255) , 
+     UsageNote                VARCHAR2 (4096) , 
+     Image_Blob               BLOB , 
+     Image_Name               VARCHAR2 (128) , 
+     Image_MimeType_ID        VARCHAR2 (64) , 
+     Image_CharSet_ID         VARCHAR2 (32) , 
+     Image_LastUpdated        TIMESTAMP WITH LOCAL TIME ZONE , 
+     IsNotAutomatedTranslated CHAR (1) , 
+     TranslationQuality       NUMBER (1) , 
+     TranslationSourceCode_ID NUMBER (10) , 
+     IsActive                 CHAR (1) , 
+     RowVersion               NUMBER (10) , 
+     CreatedOn                TIMESTAMP WITH LOCAL TIME ZONE  NOT NULL , 
+     CreatedBy_ID             NUMBER (10)  NOT NULL , 
+     ChangedOn                TIMESTAMP WITH LOCAL TIME ZONE , 
+     ChangedBy_ID             NUMBER (10) , 
+     DeletedOn                TIMESTAMP WITH LOCAL TIME ZONE , 
+     DeletedBy_ID             NUMBER (10) , 
+     IsDeleted                CHAR (1) 
     ) 
 ;
-CREATE INDEX T_CoQQualityCostCalc_IDX ON T_CoQ 
+CREATE INDEX T_CoQCostTypeName__IDX ON T_CoQCostTypeName 
     ( 
-     ID ASC , 
      Tenant_ID ASC , 
-     SessionID ASC , 
-     CreatedBy_ID ASC , 
-     IsDeleted ASC 
+     LanguageCode_ID ASC , 
+     CoQCostType_ID ASC 
     ) 
 ;
 
-ALTER TABLE T_CoQ 
-    ADD CONSTRAINT T_CoQ_PK PRIMARY KEY ( ID ) ;
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCostTypeName_PK PRIMARY KEY ( ID ) ;
 
-ALTER TABLE T_CoQ 
-    ADD CONSTRAINT T_CoQ_CurrCode FOREIGN KEY 
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_LangCode FOREIGN KEY 
     ( 
-     CurrencyCode_ID
+     LanguageCode_ID
     ) 
     REFERENCES T_Constant 
     ( 
@@ -82,19 +63,30 @@ ALTER TABLE T_CoQ
     ) 
 ;
 
-ALTER TABLE T_CoQ 
-    ADD CONSTRAINT T_CoQ_QuantUnitCode FOREIGN KEY 
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_T_CoQCType_FK FOREIGN KEY 
     ( 
-     DisplayUnit_ID
+     CoQCostType_ID
     ) 
-    REFERENCES T_Constant 
+    REFERENCES T_CoQCostType 
     ( 
      ID
     ) 
 ;
 
-ALTER TABLE T_CoQ 
-    ADD CONSTRAINT T_CoQ_T_Tenant_FK FOREIGN KEY 
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_T_EventType_FK FOREIGN KEY 
+    ( 
+     CoQCostType_ID
+    ) 
+    REFERENCES T_EventType 
+    ( 
+     ID
+    ) 
+;
+
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_T_Tenant_FK FOREIGN KEY 
     ( 
      Tenant_ID
     ) 
@@ -104,8 +96,8 @@ ALTER TABLE T_CoQ
     ) 
 ;
 
-ALTER TABLE T_CoQ 
-    ADD CONSTRAINT T_CoQ_T_User_FK FOREIGN KEY 
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_T_User_FK FOREIGN KEY 
     ( 
      CreatedBy_ID
     ) 
@@ -115,8 +107,8 @@ ALTER TABLE T_CoQ
     ) 
 ;
 
-ALTER TABLE T_CoQ 
-    ADD CONSTRAINT T_CoQ_T_User_FKv2 FOREIGN KEY 
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_T_User_FKv2 FOREIGN KEY 
     ( 
      ChangedBy_ID
     ) 
@@ -126,8 +118,8 @@ ALTER TABLE T_CoQ
     ) 
 ;
 
-ALTER TABLE T_CoQ 
-    ADD CONSTRAINT T_CoQ_T_User_FKv3 FOREIGN KEY 
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_T_User_FKv3 FOREIGN KEY 
     ( 
      DeletedBy_ID
     ) 
@@ -137,25 +129,36 @@ ALTER TABLE T_CoQ
     ) 
 ;
 
-CREATE SEQUENCE T_CoQ_ID_SEQ 
+ALTER TABLE T_CoQCostTypeName 
+    ADD CONSTRAINT T_CoQCTypeName_TransSourceCode FOREIGN KEY 
+    ( 
+     TranslationSourceCode_ID
+    ) 
+    REFERENCES T_Constant 
+    ( 
+     ID
+    ) 
+;
+
+CREATE SEQUENCE T_CoQCostTypeName_ID_SEQ 
 START WITH 1 
     NOCACHE 
     ORDER ;
 
-CREATE OR REPLACE TRIGGER T_CoQ_ID_TRG 
-BEFORE INSERT ON T_CoQ 
+CREATE OR REPLACE TRIGGER T_CoQCostTypeName_ID_TRG 
+BEFORE INSERT ON T_CoQCostTypeName 
 FOR EACH ROW 
 WHEN (NEW.ID IS NULL) 
 BEGIN 
-    :NEW.ID := T_CoQ_ID_SEQ.NEXTVAL; 
+    :NEW.ID := T_CoQCostTypeName_ID_SEQ.NEXTVAL; 
 END;
 /
 
--- T_CoQ DDL Trigger Script
+-- T_CoQCostTypeName DDL Trigger Script
 -- Oracle APEX Developer Template
 
-CREATE OR REPLACE TRIGGER TRG_T_CoQ_BIU
-    BEFORE INSERT OR UPDATE ON T_CoQ
+CREATE OR REPLACE TRIGGER TRG_T_CoQCostTypeName_BIU
+    BEFORE INSERT OR UPDATE ON T_CoQCostTypeName
     FOR EACH ROW
 DECLARE
     v_user_id NUMBER;
@@ -200,21 +203,8 @@ BEGIN
             :NEW.IsDeleted := 'N';
         END IF;
         
-        IF :NEW.OpportunityEnabled IS NULL THEN
-            :NEW.OpportunityEnabled := 'N';
-        END IF;
-        
-        IF :NEW.IsTemplate IS NULL THEN
-            :NEW.IsTemplate := 'N';
-        END IF;
-        
-        IF :NEW.IsPublic IS NULL THEN
-            :NEW.IsPublic := 'N';
-        END IF;
-        
-        -- Set AnalysisDate if not provided
-        IF :NEW.AnalysisDate IS NULL THEN
-            :NEW.AnalysisDate := v_current_time;
+        IF :NEW.IsNotAutomatedTranslated IS NULL THEN
+            :NEW.IsNotAutomatedTranslated := 'N';
         END IF;
     END IF;
 
@@ -230,6 +220,16 @@ BEGIN
         -- Preserve original creation audit fields
         :NEW.CreatedOn := :OLD.CreatedOn;
         :NEW.CreatedBy_ID := :OLD.CreatedBy_ID;
+        
+        -- Handle BLOB field - automatically update Image_LastUpdated if Image_Blob is modified
+        IF UPDATING('Image_Blob') AND (
+            (:OLD.Image_Blob IS NULL AND :NEW.Image_Blob IS NOT NULL) OR
+            (:OLD.Image_Blob IS NOT NULL AND :NEW.Image_Blob IS NULL) OR
+            (:OLD.Image_Blob IS NOT NULL AND :NEW.Image_Blob IS NOT NULL AND 
+             DBMS_LOB.COMPARE(:OLD.Image_Blob, :NEW.Image_Blob) != 0)
+        ) THEN
+            :NEW.Image_LastUpdated := v_current_time;
+        END IF;
     END IF;
 
     -- Validate required fields
@@ -240,8 +240,8 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         -- Log error and re-raise
-        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQ_BIU: ' || SQLERRM);
-END TRG_T_CoQ_BIU;
+        RAISE_APPLICATION_ERROR(-20999, 'Error in TRG_T_CoQCostTypeName_BIU: ' || SQLERRM);
+END TRG_T_CoQCostTypeName_BIU;
 /
 
 
@@ -250,7 +250,7 @@ END TRG_T_CoQ_BIU;
 -- 
 -- CREATE TABLE                             1
 -- CREATE INDEX                             1
--- ALTER TABLE                              7
+-- ALTER TABLE                              9
 -- CREATE VIEW                              0
 -- ALTER VIEW                               0
 -- CREATE PACKAGE                           0
